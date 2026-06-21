@@ -8,7 +8,7 @@ import { useRef, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Home() {
-  const { messages, input, setInput, handleInputChange, handleSubmit, isLoading, stop } = useChat();
+  const { messages, input = "", setInput, handleInputChange, handleSubmit, isLoading, stop } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom of messages can be handled by adding a ref to the end of the list
@@ -39,19 +39,19 @@ export default function Home() {
             </div>
           ))}
         </main>
-        
+
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pointer-events-none md:left-[var(--sidebar-width)] transition-all duration-300">
           <div className="max-w-3xl mx-auto w-full pointer-events-auto">
             <form onSubmit={handleSubmit} className="w-full relative group">
               <div className="flex flex-col w-full rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900 dark:focus-within:ring-zinc-800/50">
-                <Input 
-                  type="text" 
+                <Input
+                  type="text"
                   value={input}
                   onChange={handleInputChange}
-                  placeholder="Ask anything..." 
+                  placeholder="Ask anything..."
                   className="min-h-[50px] w-full border-0 bg-transparent px-4 py-3 text-base shadow-none outline-none focus-visible:ring-0"
                 />
-                
+
                 <div className="flex items-center justify-between p-2">
                   <div className="flex items-center gap-2">
                     <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
@@ -68,7 +68,7 @@ export default function Home() {
                       <StopCircle className="size-4" />
                     </Button>
                   ) : (
-                    <Button type="submit" disabled={!input.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
+                    <Button type="submit" disabled={!input?.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
                       <ArrowRight className="size-4" />
                     </Button>
                   )}
@@ -91,15 +91,15 @@ export default function Home() {
         <div className="w-full relative group">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col w-full rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900 dark:focus-within:ring-zinc-800/50">
-              <Input 
+              <Input
                 ref={inputRef}
-                type="text" 
+                type="text"
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Ask anything..." 
+                placeholder="Ask anything..."
                 className="min-h-[60px] w-full border-0 bg-transparent px-4 py-4 text-base md:text-lg shadow-none outline-none focus-visible:ring-0"
               />
-              
+
               <div className="flex items-center justify-between p-2">
                 <div className="flex items-center gap-2">
                   <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
@@ -111,7 +111,7 @@ export default function Home() {
                     <span className="text-xs font-medium">Attach</span>
                   </Button>
                 </div>
-                <Button type="submit" disabled={!input.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
+                <Button type="submit" disabled={!input?.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
@@ -121,9 +121,9 @@ export default function Home() {
 
         <div className="flex flex-wrap items-center justify-center gap-2">
           {["Latest tech news", "Explain quantum physics", "Healthy dinner recipes", "Write a python script"].map((suggestion) => (
-            <Button 
-              key={suggestion} 
-              variant="outline" 
+            <Button
+              key={suggestion}
+              variant="outline"
               onClick={() => handleInputChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>)}
               className="rounded-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-sm font-normal text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
             >
