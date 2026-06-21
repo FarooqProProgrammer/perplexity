@@ -21,6 +21,22 @@ services:
     volumes:
       - redis_data:/data
 
+  searxng:
+    image: searxng/searxng:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - searxng_data:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+
+  inngest:
+    image: inngest/inngest:latest
+    ports:
+      - "8288:8288"
+
 volumes:
   postgres_data:
   redis_data:
+  searxng_data:
