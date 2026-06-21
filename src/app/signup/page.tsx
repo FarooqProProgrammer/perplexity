@@ -1,73 +1,125 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Field, FieldLabel, FieldContent } from "@/components/ui/field"
 import Link from "next/link"
 import { registerUser } from "./actions"
 import { useActionState } from "react"
+import { ArrowRight } from "lucide-react"
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState(registerUser, undefined)
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md shadow-lg border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight text-center">
-            Create an account
-          </CardTitle>
-          <CardDescription className="text-center text-zinc-500 dark:text-zinc-400">
-            Enter your email below to create your account
-          </CardDescription>
-        </CardHeader>
-        <form action={formAction}>
-          <CardContent className="space-y-4">
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-[#FBFAF6] dark:bg-[#191A1A] px-6">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.4] dark:opacity-[0.15]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #19191708 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-[380px]">
+        {/* Mark */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#20808D]">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#FBFAF6]" />
+          </div>
+          <h1 className="text-[28px] leading-tight text-[#191A1A] dark:text-[#F5F4ED]">
+            Create an <span className="font-serif italic font-normal">account</span>
+          </h1>
+          <p className="mt-2 text-[14px] text-[#6B6B64] dark:text-[#9B9A8F]">
+            Get started in less than a minute
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="rounded-2xl border border-[#E4E1D8] dark:border-[#33322E] bg-white dark:bg-[#1F1F1D] p-7 shadow-[0_1px_2px_rgba(25,25,23,0.04)]">
+          <form action={formAction} className="space-y-5">
             {state?.error && (
-              <div className="text-sm font-medium text-red-500 dark:text-red-400">
+              <div className="rounded-lg border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-3 py-2.5 text-center text-[13px] font-medium text-red-600 dark:text-red-400">
                 {state.error}
               </div>
             )}
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <FieldContent>
-                <Input id="email" name="email" type="email" placeholder="m@example.com" required />
-              </FieldContent>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <FieldContent>
-                <Input id="password" name="password" type="password" required />
-              </FieldContent>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-              <FieldContent>
-                <Input id="confirm-password" name="confirm-password" type="password" required />
-              </FieldContent>
-            </Field>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4 mt-2">
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Signing up..." : "Sign Up"}
-            </Button>
-            <div className="text-sm text-center text-zinc-500 dark:text-zinc-400">
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
-                Sign in
-              </Link>
+
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="email"
+                  className="text-[12px] font-medium text-[#6B6B64] dark:text-[#9B9A8F]"
+                >
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  required
+                  className="h-11 rounded-lg border-[#E4E1D8] dark:border-[#33322E] bg-[#FBFAF6] dark:bg-[#191A1A] px-3.5 text-[14px] text-[#191A1A] dark:text-[#F5F4ED] placeholder:text-[#A8A69B] focus-visible:border-[#20808D] focus-visible:ring-1 focus-visible:ring-[#20808D]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="password"
+                  className="text-[12px] font-medium text-[#6B6B64] dark:text-[#9B9A8F]"
+                >
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="h-11 rounded-lg border-[#E4E1D8] dark:border-[#33322E] bg-[#FBFAF6] dark:bg-[#191A1A] px-3.5 text-[14px] text-[#191A1A] dark:text-[#F5F4ED] placeholder:text-[#A8A69B] focus-visible:border-[#20808D] focus-visible:ring-1 focus-visible:ring-[#20808D]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="confirm-password"
+                  className="text-[12px] font-medium text-[#6B6B64] dark:text-[#9B9A8F]"
+                >
+                  Confirm password
+                </label>
+                <Input
+                  id="confirm-password"
+                  name="confirm-password"
+                  type="password"
+                  required
+                  className="h-11 rounded-lg border-[#E4E1D8] dark:border-[#33322E] bg-[#FBFAF6] dark:bg-[#191A1A] px-3.5 text-[14px] text-[#191A1A] dark:text-[#F5F4ED] placeholder:text-[#A8A69B] focus-visible:border-[#20808D] focus-visible:ring-1 focus-visible:ring-[#20808D]"
+                />
+              </div>
             </div>
-          </CardFooter>
-        </form>
-      </Card>
+
+            <Button
+              type="submit"
+              className="group h-11 w-full rounded-lg bg-[#20808D] hover:bg-[#18656F] text-white text-[14px] font-medium transition-colors"
+              disabled={isPending}
+            >
+              <span className="flex items-center justify-center gap-1.5">
+                {isPending ? "Creating account..." : "Create account"}
+                {!isPending && (
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                )}
+              </span>
+            </Button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-[13px] text-[#6B6B64] dark:text-[#9B9A8F]">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="font-medium text-[#20808D] hover:text-[#18656F] transition-colors"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }
-

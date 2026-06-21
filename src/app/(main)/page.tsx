@@ -4,14 +4,123 @@ import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Paperclip, Globe, StopCircle } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+  ModelSelectorContent,
+  ModelSelectorList,
+  ModelSelectorGroup,
+  ModelSelectorItem,
+  ModelSelectorLogo,
+  ModelSelectorName,
+  ModelSelectorInput,
+} from "@/components/ai-elements/model-selector";
+import { useQuery } from "@tanstack/react-query";
+
+const DEFAULT_MODELS = [
+  { id: "openai/gpt-4o-mini", name: "GPT-4o Mini", provider: "openai" },
+  { id: "anthropic/claude-3.5-sonnet", name: "Claude 3.5 Sonnet", provider: "anthropic" },
+  { id: "google/gemini-flash-1.5", name: "Gemini 1.5 Flash", provider: "google" },
+  { id: "meta-llama/llama-3-8b-instruct", name: "Llama 3", provider: "llama" },
+  { id: "openrouter/auto", name: "Auto (Best Model)", provider: "openrouter" },
+];
+
+const PROVIDER_NAMES: Record<string, string> = {
+  openai: "OpenAI",
+  anthropic: "Anthropic",
+  google: "Google",
+  llama: "Meta Llama",
+  openrouter: "OpenRouter",
+  mistral: "Mistral",
+  cohere: "Cohere",
+  xai: "xAI",
+  deepseek: "DeepSeek",
+  perplexity: "Perplexity",
+};
 
 export default function Home() {
   const { messages, input = "", setInput, handleInputChange, handleSubmit, isLoading, stop } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedModelId, setSelectedModelId] = useState(DEFAULT_MODELS[0].id);
 
-  // Auto-scroll to bottom of messages can be handled by adding a ref to the end of the list
+  // Use React Query to fetch all OpenRouter models dynamically
+  const { data: openRouterModels } = useQuery({
+    queryKey: ["openRouterModels"],
+    queryFn: async () => {
+      const res = await fetch("https://openrouter.ai/api/v1/models");
+      const json = await res.json();
+      return json.data.map((m: any) => {
+        // Parse provider
+        const rawProvider = m.id.split("/")[0];
+        const provider = rawProvider === "meta-llama" ? "llama" : rawProvider;
+        
+        // Clean up the name (e.g., remove "OpenAI: " prefix if present to make it cleaner)
+        let cleanName = m.name;
+        if (cleanName.toLowerCase().startsWith(rawProvider.toLowerCase() + ": ")) {
+          cleanName = cleanName.slice(rawProvider.length + 2);
+        }
+        
+        return {
+          id: m.id,
+          name: cleanName,
+          provider,
+        };
+      });
+    },
+    staleTime: 1000 * 60 * 60, // cache for 1 hour
+  });
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ONLY use fetched models after mounting to prevent hydration mismatch
+  const models = mounted && openRouterModels && openRouterModels.length > 0 ? openRouterModels : DEFAULT_MODELS;
+  const selectedModel = models.find((m: any) => m.id === selectedModelId) || models[0];
+
+  // Group models by provider
+  const groupedModels = models.reduce((acc: any, model: any) => {
+    if (!acc[model.provider]) acc[model.provider] = [];
+    acc[model.provider].push(model);
+    return acc;
+  }, {});
+
+  const modelSelectorElement = (
+    <ModelSelector>
+      <ModelSelectorTrigger asChild>
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100" suppressHydrationWarning>
+          <ModelSelectorLogo provider={selectedModel.provider as any} />
+          <span className="text-xs font-medium hidden sm:inline">
+            {selectedModel.name}
+          </span>
+        </Button>
+      </ModelSelectorTrigger>
+      <ModelSelectorContent>
+        <ModelSelectorInput placeholder="Search models..." />
+        <ModelSelectorList>
+          {Object.entries(groupedModels).map(([provider, providerModels]: [string, any]) => (
+            <ModelSelectorGroup 
+              key={provider} 
+              heading={PROVIDER_NAMES[provider] || provider.charAt(0).toUpperCase() + provider.slice(1)}
+            >
+              {providerModels.map((model: any) => (
+                <ModelSelectorItem 
+                  key={model.id} 
+                  onSelect={() => setSelectedModelId(model.id)}
+                >
+                  <ModelSelectorLogo provider={model.provider as any} />
+                  <ModelSelectorName>{model.name}</ModelSelectorName>
+                </ModelSelectorItem>
+              ))}
+            </ModelSelectorGroup>
+          ))}
+        </ModelSelectorList>
+      </ModelSelectorContent>
+    </ModelSelector>
+  );
 
   if (messages.length > 0) {
     return (
@@ -62,6 +171,7 @@ export default function Home() {
                       <Paperclip className="size-4" />
                       <span className="text-xs font-medium hidden sm:inline">Attach</span>
                     </Button>
+                    {modelSelectorElement}
                   </div>
                   {isLoading ? (
                     <Button type="button" onClick={stop} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
@@ -110,6 +220,7 @@ export default function Home() {
                     <Paperclip className="size-4" />
                     <span className="text-xs font-medium">Attach</span>
                   </Button>
+                  {modelSelectorElement}
                 </div>
                 <Button type="submit" disabled={!input?.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
                   <ArrowRight className="size-4" />
