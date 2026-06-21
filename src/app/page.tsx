@@ -1,63 +1,135 @@
-import Image from "next/image";
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ArrowRight, Paperclip, Globe, StopCircle } from "lucide-react";
+import { useRef, useEffect } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+  const { messages, input, setInput, handleInputChange, handleSubmit, isLoading, stop } = useChat();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-scroll to bottom of messages can be handled by adding a ref to the end of the list
+
+  if (messages.length > 0) {
+    return (
+      <div className="flex h-full w-full flex-col bg-background">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 max-w-4xl mx-auto w-full pb-32">
+          {messages.map(m => (
+            <div key={m.id} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                {m.role === 'user' ? (
+                  <Avatar className="size-6">
+                    <AvatarFallback className="bg-zinc-200 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">U</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Avatar className="size-6">
+                    <AvatarFallback className="bg-teal-500 text-xs text-white">AI</AvatarFallback>
+                  </Avatar>
+                )}
+                <span className="font-semibold text-sm">
+                  {m.role === 'user' ? 'You' : 'Perplexity'}
+                </span>
+              </div>
+              <div className="pl-8 text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
+                {m.content}
+              </div>
+            </div>
+          ))}
+        </main>
+        
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pointer-events-none md:left-[var(--sidebar-width)] transition-all duration-300">
+          <div className="max-w-3xl mx-auto w-full pointer-events-auto">
+            <form onSubmit={handleSubmit} className="w-full relative group">
+              <div className="flex flex-col w-full rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900 dark:focus-within:ring-zinc-800/50">
+                <Input 
+                  type="text" 
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Ask anything..." 
+                  className="min-h-[50px] w-full border-0 bg-transparent px-4 py-3 text-base shadow-none outline-none focus-visible:ring-0"
+                />
+                
+                <div className="flex items-center justify-between p-2">
+                  <div className="flex items-center gap-2">
+                    <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                      <Globe className="size-4" />
+                      <span className="text-xs font-medium hidden sm:inline">Focus</span>
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                      <Paperclip className="size-4" />
+                      <span className="text-xs font-medium hidden sm:inline">Attach</span>
+                    </Button>
+                  </div>
+                  {isLoading ? (
+                    <Button type="button" onClick={stop} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
+                      <StopCircle className="size-4" />
+                    </Button>
+                  ) : (
+                    <Button type="submit" disabled={!input.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center p-4 bg-background">
+      <main className="flex w-full max-w-3xl flex-col items-center gap-8">
+        <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-zinc-900 dark:text-zinc-50 text-center">
+          Where knowledge begins
+        </h1>
+
+        <div className="w-full relative group">
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col w-full rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-zinc-200/50 dark:border-zinc-800 dark:bg-zinc-900 dark:focus-within:ring-zinc-800/50">
+              <Input 
+                ref={inputRef}
+                type="text" 
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Ask anything..." 
+                className="min-h-[60px] w-full border-0 bg-transparent px-4 py-4 text-base md:text-lg shadow-none outline-none focus-visible:ring-0"
+              />
+              
+              <div className="flex items-center justify-between p-2">
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                    <Globe className="size-4" />
+                    <span className="text-xs font-medium">Focus</span>
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+                    <Paperclip className="size-4" />
+                    <span className="text-xs font-medium">Attach</span>
+                  </Button>
+                </div>
+                <Button type="submit" disabled={!input.trim()} size="icon" className="size-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 disabled:opacity-50">
+                  <ArrowRight className="size-4" />
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {["Latest tech news", "Explain quantum physics", "Healthy dinner recipes", "Write a python script"].map((suggestion) => (
+            <Button 
+              key={suggestion} 
+              variant="outline" 
+              onClick={() => handleInputChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>)}
+              className="rounded-full bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-sm font-normal text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
+              {suggestion}
+            </Button>
+          ))}
         </div>
       </main>
     </div>

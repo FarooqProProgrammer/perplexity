@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Roboto_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "@/components/providers";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function RootLayout({
   children,
@@ -28,11 +30,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${robotoMono.variable} font-sans h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                {children}
+              </SidebarInset>
+            </SidebarProvider>
+          </TooltipProvider>
         </Providers>
       </body>
     </html>
