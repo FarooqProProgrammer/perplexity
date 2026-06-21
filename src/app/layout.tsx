@@ -19,8 +19,6 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "@/components/providers";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
 
 export default function RootLayout({
   children,
@@ -35,12 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <TooltipProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                {children}
-              </SidebarInset>
-            </SidebarProvider>
+            {children}
           </TooltipProvider>
         </Providers>
       </body>
